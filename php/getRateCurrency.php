@@ -11,6 +11,9 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 	return true;
 });
 
+/*
+Функция сохраняет данные о валюте в базу данных
+*/
 function save($name, $month, $currencyRateRange) {
 	$conn = new PDO('mysql:host=localhost;dbname=currency_rate;charset=utf8', 'root', '');
     $insert = $conn->prepare('INSERT INTO currency (name, month, rate) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE name=?, month=?, rate=?');
@@ -24,9 +27,13 @@ function save($name, $month, $currencyRateRange) {
 	));
 }
 
+/*
+Функция возвращает данные о валюте, в течение указанного месяца
+*/
 function getCurrencyByMonth($name, $month, $baseUrl) {
 	$currencyMonth = array();
-	for ($i = 1; $i <= 31; $i++) {
+	$daysInMonth = 31;
+	for ($i = 1; $i <= $daysInMonth; $i++) {
 		$currencyDay = file_get_contents(sprintf($baseUrl, $month, $i));
 		$array = json_decode($currencyDay, true);
 		$value = $array["Valute"][$name]["Value"];
