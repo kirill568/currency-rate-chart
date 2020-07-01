@@ -1,12 +1,12 @@
 <?
 
-$currencyName = 'JPY';
-$month = 5;
+$currencyName = $_POST['name'];
+$month = $_POST['month'];
 $baseUrl = "https://www.cbr-xml-daily.ru/archive/2020/%02d/%02d/daily_json.js";
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 	if ($errno = E_USER_WARNING) {
-		echo "<b>USER WARNING</b> [$errno] $errstr<br />\n";
+		
 	}
 	return true;
 });
@@ -30,12 +30,15 @@ function getCurrencyByMonth($name, $month, $baseUrl) {
 		$currencyDay = file_get_contents(sprintf($baseUrl, $month, $i));
 		$array = json_decode($currencyDay, true);
 		$value = $array["Valute"][$name]["Value"];
+		$date = substr($array["Date"], 0, 10);
 		if (!is_null($value)) {
-			$currencyMonth[$array["Date"]] = $value;
+			$currencyMonth[$date] = $value;
 		}
 	}
 	save($name, $month, json_encode($currencyMonth));
 	return $currencyMonth;
 }
 
-print_r(getCurrencyByMonth($currencyName, $month, $baseUrl));
+$data = getCurrencyByMonth($currencyName, $month, $baseUrl);
+
+echo json_encode($data);
